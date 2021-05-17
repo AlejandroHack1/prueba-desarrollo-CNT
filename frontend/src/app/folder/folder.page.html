@@ -1,0 +1,481 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{ folder }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+
+
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">{{ folder }}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div>
+
+    <div *ngIf="folder == 'Registro'">
+
+      <form [formGroup]="authForm" (ngSubmit)="Register()" novalidate>
+
+        <ion-list>
+
+
+          <ion-item>
+            <ion-label position="stacked">Nombre de Paciente</ion-label>
+            <ion-input formControlName="username" type="text" name="username" #username></ion-input>
+          </ion-item>
+
+          <span class="error ion-padding" *ngIf="submitted && errorControl.username.errors?.required">
+            Nombre de paciente es requerido
+          </span>
+          <span class="error ion-padding" *ngIf="submitted && errorControl.username.errors?.pattern">
+            Permitido solo letras
+          </span>
+
+          <ion-item>
+            <ion-label position="stacked">Numero Historia Clínica</ion-label>
+            <ion-input formControlName="historiaClinica" type="number" name="historiaClinica" #historiaClinica>
+            </ion-input>
+          </ion-item>
+
+          <span class="error ion-padding" *ngIf="submitted && errorControl.historiaClinica.errors?.required">
+            Historia Clinica es requerido!
+          </span>
+
+
+          <ion-item>
+            <ion-label position="stacked">Edad</ion-label>
+            <ion-input formControlName="edad" type="number" name="edad" #edad [(ngModel)]="valueEdad"
+              (ionChange)="onChange(valueEdad)"></ion-input>
+          </ion-item>
+          <span class="error ion-padding" *ngIf="submitted && errorControl.edad.errors?.required">
+            Edad es requerido!
+          </span>
+
+          <!--Si es Joven-->
+
+          <ion-item *ngIf="verificarEdad <= 40 && verificarEdad >= 16">
+            <ion-label>Fuma?</ion-label>
+            <ion-select formControlName="option" name="option" #option [(ngModel)]="valueFuma"
+              (ionChange)="onChangeFuma(valueFuma)">
+
+              <ion-select-option value="1">SI</ion-select-option>
+              <ion-select-option value="0">NO</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <span class="error ion-padding" *ngIf="submitted && errorControl.option.errors?.required">
+            Escoge una opción
+          </span>
+
+
+          <div [hidden]="!value">
+            <ion-item>
+              <ion-label position="stacked">Años fumando?</ion-label>
+              <ion-input formControlName="anosFumando" type="number" name="anosFumando" #anosFumando>
+              </ion-input>
+            </ion-item>
+            <span class="error ion-padding" *ngIf="submitted && errorControl.anosFumando.errors?.required">
+              Años de fumar es requerido!
+            </span>
+          </div>
+
+
+          <!--niños-->
+
+          <ion-item *ngIf="verificarEdad <= 15 && verificarEdad >= 1">
+            <ion-label position="stacked">Relación peso-estatura</ion-label>
+            <ion-input formControlName="pesoEstatura" type="number" name="pesoEstatura" #pesoEstatura>
+            </ion-input>
+          </ion-item>
+          <span class="error ion-padding" *ngIf="submitted && errorControl.pesoEstatura.errors?.required">
+            Relación peso-estatura es requerido!
+          </span>
+
+
+          <!--anciano-->
+
+          <ion-item *ngIf="verificarEdad >= 41">
+            <ion-label>Tiene dieta asignada?</ion-label>
+            <ion-select formControlName="tieneDieta" name="tieneDieta" #tieneDieta>
+              <ion-select-option value="1">SI</ion-select-option>
+              <ion-select-option value="0">NO</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <span class="error ion-padding" *ngIf="submitted && errorControl.tieneDieta.errors?.required">
+            Tiene Dieta Asiganada es requerido!
+          </span>
+
+
+          <ion-row>
+            <ion-col>
+              <ion-button type="submit" expand="block">Registrar Paciente</ion-button>
+            </ion-col>
+          </ion-row>
+
+
+
+        </ion-list>
+
+      </form>
+
+    </div>
+
+
+
+
+
+
+    <div *ngIf="folder == 'Listar_Pacientes_Mayor_Riesgo'">
+
+      <ion-item>
+        <ion-label position="stacked">Numero Historia Clínica</ion-label>
+        <ion-input type="number" name="numeroHistoriaClinica" #numeroHistoriaClinica></ion-input>
+      </ion-item>
+
+      <ion-button type="submit" expand="block" (click)="list()">Listar Pacientes con Mayor Prioridad</ion-button>
+
+
+
+      <p *ngIf="showList == 'false'">No se encontro Ningun paciente con esa Historia Clínica</p>
+
+
+      <ngx-datatable *ngIf="showList" class="material" [rowHeight]="auto" [headerHeight]="40" [footerHeight]="40"
+        [rows]="rows" [columns]="columns" [columnMode]="'force'" [scrollbarH]="true" [limit]="10" [sortType]="'multi'">
+
+        <ngx-datatable-column [sortable]="true" name="Nombre">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.nombre}}
+          </ng-template>
+        </ngx-datatable-column>
+
+
+        <ngx-datatable-column [sortable]="true" name="Historia Clínica">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.noHistoriaClinica}}
+          </ng-template>
+        </ngx-datatable-column>
+
+
+        <ngx-datatable-column [sortable]="true" name="Edad">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.edad}}
+          </ng-template>
+        </ngx-datatable-column>
+
+
+        <ngx-datatable-column [sortable]="true" name="Prioridad">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.prioridad}}
+          </ng-template>
+        </ngx-datatable-column>
+
+      </ngx-datatable>
+
+
+    </div>
+
+
+
+    <div *ngIf="folder == 'Atender_Paciente'">
+
+
+      <ion-button type="submit" (click)="Listassign()">Atender Paciente</ion-button>
+
+
+      <!--Urgencias-->
+
+      <div *ngIf="show">
+
+        <h5>Da click en el nombre para atender al paciente</h5>
+
+        <p>Sala de Espera Urgencias</p>
+        <ngx-datatable *ngIf="show" class="material" [rowHeight]="40" [headerHeight]="40" [footerHeight]="40"
+          [rows]="urgencias" [columns]="columns" [scrollbarH]="true" [columnMode]="'force'" [limit]="10"
+          [sortType]="'multi'">
+
+
+
+          <ngx-datatable-column name="Nombre">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              <button ion-button small outline (click)="assign(row,2,'urgencias')">{{row.nombre}}</button>
+            </ng-template>
+          </ngx-datatable-column>
+
+
+          <ngx-datatable-column name="Historia Clínica">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.noHistoriaClinica}}
+            </ng-template>
+          </ngx-datatable-column>
+
+
+          <ngx-datatable-column name="Edad">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.edad}}
+            </ng-template>
+          </ngx-datatable-column>
+
+
+          <ngx-datatable-column name="Prioridad">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.prioridad}}
+            </ng-template>
+          </ngx-datatable-column>
+
+        </ngx-datatable>
+
+        <!--Pediatria-->
+        <p>Sala de Espera Pediatria</p>
+        <ngx-datatable *ngIf="show" class="material" [rowHeight]="40" [headerHeight]="40" [footerHeight]="40"
+          [rows]="pediatria" [columns]="columns" [scrollbarH]="true" [columnMode]="'force'" [limit]="10"
+          [sortType]="'multi'">
+
+
+
+          <ngx-datatable-column name="Nombre">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              <button ion-button small outline (click)="assign(row,1,'pediatria')">{{row.nombre}}</button>
+            </ng-template>
+          </ngx-datatable-column>
+
+
+          <ngx-datatable-column name="Historia Clínica">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.noHistoriaClinica}}
+            </ng-template>
+          </ngx-datatable-column>
+
+
+          <ngx-datatable-column name="Edad">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.edad}}
+            </ng-template>
+          </ngx-datatable-column>
+
+
+          <ngx-datatable-column name="Prioridad">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.prioridad}}
+            </ng-template>
+          </ngx-datatable-column>
+
+        </ngx-datatable>
+
+        <!--Medicina Integral-->
+        <p>Sala de Espera Medicina Integral</p>
+        <ngx-datatable *ngIf="show" class="material" [rowHeight]="40" [headerHeight]="40" [footerHeight]="40"
+          [rows]="general" [columns]="columns" [scrollbarH]="true" [columnMode]="'force'" [limit]="10"
+          [sortType]="'multi'">
+
+
+
+          <ngx-datatable-column name="Nombre">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              <button ion-button small outline (click)="assign(row,3,'general')">{{row.nombre}}</button>
+            </ng-template>
+          </ngx-datatable-column>
+
+
+          <ngx-datatable-column name="Historia Clínica">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.noHistoriaClinica}}
+            </ng-template>
+          </ngx-datatable-column>
+
+
+          <ngx-datatable-column name="Edad">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.edad}}
+            </ng-template>
+          </ngx-datatable-column>
+
+
+          <ngx-datatable-column name="Prioridad">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.prioridad}}
+            </ng-template>
+          </ngx-datatable-column>
+
+        </ngx-datatable>
+
+
+
+
+      </div>
+
+    </div>
+
+    <div *ngIf="folder == 'Liberar_Consultas'">
+
+      <ion-button type="submit" (click)="Liberar()">Liberar Consultas</ion-button>
+
+
+    </div>
+
+    <div *ngIf="folder == 'Listar_Pacientes_Fumadores_Urgentes'">
+
+      <!--Fumadores-->
+      <p>Pacientes Fumadores</p>
+      <ngx-datatable class="material" [rowHeight]="40" [headerHeight]="40" [footerHeight]="40" [rows]="fumadores"
+        [columns]="columns" [scrollbarH]="true" [columnMode]="'force'" [limit]="10" [sortType]="'multi'">
+
+
+
+        <ngx-datatable-column name="Nombre">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.nombre}}
+          </ng-template>
+        </ngx-datatable-column>
+
+
+        <ngx-datatable-column name="Historia Clínica">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.noHistoriaClinica}}
+          </ng-template>
+        </ngx-datatable-column>
+
+
+        <ngx-datatable-column name="Edad">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.edad}}
+          </ng-template>
+        </ngx-datatable-column>
+
+
+        <ngx-datatable-column name="Prioridad">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.prioridad}}
+          </ng-template>
+        </ngx-datatable-column>
+
+      </ngx-datatable>
+
+
+    </div>
+
+
+
+    <div *ngIf="folder == 'Consulta_mas_Pacientes_Atendidos'">
+
+      <!--Consultas con mas pacientes atendidos-->
+      <p>Consulta con mas pacientes atendidos</p>
+      <ngx-datatable class="material" [rowHeight]="40" [headerHeight]="40" [footerHeight]="40"
+        [rows]="generalConsultaMasAtencion" [columns]="columns" [scrollbarH]="true" [columnMode]="'force'" [limit]="10"
+        [sortType]="'multi'">
+
+
+
+        <ngx-datatable-column name="Nombre Especialista">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.nombreEspecialista}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Especialidad">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.nombre}}
+          </ng-template>
+        </ngx-datatable-column>
+
+
+        <ngx-datatable-column name="Pacientes Atendidos">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.pacientesAtendidos}}
+          </ng-template>
+        </ngx-datatable-column>
+
+
+
+
+      </ngx-datatable>
+
+
+    </div>
+
+
+    <div *ngIf="folder == 'Paciente_Mas_Anciano'">
+
+      <!--Consulta el paciente de mayor edad-->
+      <p>Paciente mayor edad</p>
+      <ngx-datatable class="material" [rowHeight]="40" [headerHeight]="40" [footerHeight]="40" [rows]="max"
+        [columns]="columns" [scrollbarH]="true" [columnMode]="'force'" [limit]="10" [sortType]="'multi'">
+
+
+
+        <ngx-datatable-column name="Nombre">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.nombre}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Historia Clinica">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.noHistoriaClinica}}
+          </ng-template>
+        </ngx-datatable-column>
+
+
+        <ngx-datatable-column name="edad">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.edad}}
+          </ng-template>
+        </ngx-datatable-column>
+
+
+
+
+      </ngx-datatable>
+
+
+    </div>
+
+
+    <div *ngIf="folder == 'Optimizar_Atención'">
+
+      <ngx-datatable class="material" [rowHeight]="40" [headerHeight]="40" [footerHeight]="40" [rows]="optimizacion"
+        [columns]="columns" [scrollbarH]="true" [columnMode]="'force'" [limit]="10" [sortType]="'multi'">
+
+
+
+        <ngx-datatable-column name="Nombre">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.nombre}}
+          </ng-template>
+        </ngx-datatable-column>
+
+
+        <ngx-datatable-column name="Historia Clínica">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.noHistoriaClinica}}
+          </ng-template>
+        </ngx-datatable-column>
+
+
+        <ngx-datatable-column name="Edad">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.edad}}
+          </ng-template>
+        </ngx-datatable-column>
+
+
+        <ngx-datatable-column name="Prioridad">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.prioridad}}
+          </ng-template>
+        </ngx-datatable-column>
+
+      </ngx-datatable>
+
+    </div>
+
+
+  </div>
+</ion-content>
